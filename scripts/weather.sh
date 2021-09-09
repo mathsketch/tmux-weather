@@ -20,16 +20,20 @@ main() {
   local current_time=$(date "+%s")
   local previous_update=$(get_tmux_option "@weather-previous-update-time")
   local delta=$((current_time - previous_update))
+  local weather_style_left=$(get_tmux_option "@weather-style-left")
+  local weather_style_right=$(get_tmux_option "@weather-style-right")
 
   if [ -z "$previous_update" ] || [ $delta -ge $update_interval ]; then
     local value=$(get_weather)
-    if [ "$?" -eq 0 ]; then
+    if [ "$?" -eq 0 ] && [ -n "$value" ]; then
       $(set_tmux_option "@weather-previous-update-time" "$current_time")
       $(set_tmux_option "@weather-previous-value" "$value")
     fi
   fi
 
-  echo -n $(get_tmux_option "@weather-previous-value")
+  if [ -n "$(get_tmux_option "@weather-previous-value")" ];then
+    echo -n "${weather_style_left}$(get_tmux_option @weather-previous-value)${weather_style_right}"
+  fi
 }
 
 main
