@@ -22,11 +22,9 @@ main() {
   local delta=$((current_time - previous_update))
   local weather_style_left=$(get_tmux_option "@weather-style-left")
   local weather_style_right=$(get_tmux_option "@weather-style-right")
-  local init_plugin=$(get_tmux_option "@weather-plugin-init")
 
-  if [ -z "$init_plugin" ]; then
-    echo -n "${weather_style_left}init...${weather_style_right}"
-    $(set_tmux_option "@weather-plugin-init" "complete") 
+  if [ -z "$(get_tmux_option @weather-previous-value)" ]; then
+    $(set_tmux_option "@weather-previous-value" "init...")
   else
     if [ -z "$previous_update" ] || [ $delta -ge $update_interval ]; then
       local value=$(get_weather)
@@ -35,10 +33,10 @@ main() {
         $(set_tmux_option "@weather-previous-value" "$value")
       fi
     fi
+  fi
 
-    if [ -n "$(get_tmux_option "@weather-previous-value")" ];then
-      echo -n "${weather_style_left}$(get_tmux_option @weather-previous-value)${weather_style_right}"
-    fi
+  if [ -n "$(get_tmux_option "@weather-previous-value")" ];then
+    echo -n "${weather_style_left}$(get_tmux_option @weather-previous-value)${weather_style_right}"
   fi
 }
 
